@@ -20,6 +20,10 @@ import java.util.Set;
  * GameBoard is capable to create many GameState instances, each representing an ongoing game.
  */
 public class GameMap {
+    private int maxWidth;
+    private int maxHeight;
+    private Set<Position> destinations;
+    private int undoLimit;
 
     /**
      * Create a new GameMap with width, height, set of box destinations and undo limit.
@@ -34,6 +38,10 @@ public class GameMap {
      */
     public GameMap(int maxWidth, int maxHeight, Set<Position> destinations, int undoLimit) {
         // TODO
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
+        this.destinations = destinations;
+        this.undoLimit = undoLimit;
         throw new NotImplementedException();
     }
 
@@ -107,7 +115,7 @@ public class GameMap {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        throw new NotImplementedException();
+        return this.destinations;
     }
 
     /**
@@ -117,7 +125,8 @@ public class GameMap {
      */
     public Optional<Integer> getUndoLimit() {
         // TODO
-        throw new NotImplementedException();
+        Optional<Integer> optionalUndoLimit = Optional.of(this.undoLimit);
+        return optionalUndoLimit;
     }
 
     /**
@@ -137,7 +146,7 @@ public class GameMap {
      */
     public int getMaxWidth() {
         // TODO
-        throw new NotImplementedException();
+        return this.maxWidth;
     }
 
     /**
@@ -147,6 +156,7 @@ public class GameMap {
      */
     public int getMaxHeight() {
         // TODO
-        throw new NotImplementedException();
+        return this.maxHeight;
+
     }
 }
