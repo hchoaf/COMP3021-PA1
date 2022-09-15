@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.IntStream;
 
 /**
  * A Sokoban game board.
@@ -20,10 +20,18 @@ import java.util.Set;
  * GameBoard is capable to create many GameState instances, each representing an ongoing game.
  */
 public class GameMap {
-    private int maxWidth;
-    private int maxHeight;
-    private Set<Position> destinations;
-    private int undoLimit;
+    private static int maxWidth;
+    private static int maxHeight;
+    private static Set<Position> destinations = new HashSet<Position>();
+    private static int undoLimit;
+
+    private static List<String> initialMap = new ArrayList<String>();
+    private static List<Integer> playerIds = new ArrayList<Integer>();
+
+    private static int boxNum;
+
+    private static List<Integer> boxIds = new ArrayList<Integer>();
+
 
     /**
      * Create a new GameMap with width, height, set of box destinations and undo limit.
@@ -42,7 +50,7 @@ public class GameMap {
         this.maxHeight = maxHeight;
         this.destinations = destinations;
         this.undoLimit = undoLimit;
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     /**
@@ -82,7 +90,54 @@ public class GameMap {
      */
     public static GameMap parse(String mapText) {
         // TODO
-        throw new NotImplementedException();
+        String[] arr = mapText.split("\n");
+        maxHeight = arr.length - 1;
+        for(int i = 0; i<arr.length; i++) {
+            if (i == 0) {
+                undoLimit = Integer.parseInt(arr[i]);
+                continue;
+            }
+            initialMap.add(arr[i]);
+            if (i == 1) {
+                maxWidth = arr[i].length();
+            }
+            for(int j = 0; j<arr[i].length(); j++) {
+                char block = arr[i].charAt(j);
+                switch(block) {
+                    case '#':
+                        break;
+                    case '.':
+                        break;
+                    case '@':
+                        destinations.add(new Position(j, i));
+                        break;
+                    default:
+                        if (Character.isUpperCase(block)) {
+                            if (!playerIds.contains(returnIdOfAlphabet(block))) {
+                                playerIds.add(returnIdOfAlphabet(block));
+                            }
+                        } else {
+                            if (!boxIds.contains(returnIdOfAlphabet(block))) {
+                                boxIds.add(returnIdOfAlphabet(block));
+                            }
+                            boxNum++;
+                        }
+                }
+            }
+        }
+        System.out.println("-----------------------------");
+        System.out.printf("MaxHeight: %d \n", maxHeight);
+        System.out.printf("MaxWidth: %d \n", maxWidth);
+        System.out.printf("UndoLimit: %d \n", undoLimit);
+        System.out.printf("boxNum: %d \n", boxNum);
+        System.out.printf("PlayerIds: %s \n", playerIds.toString());
+        System.out.printf("boxIds: %s \n", boxIds.toString());
+        System.out.printf("bombPositions: %s \n", destinations.toString());
+        for(int i = 0; i<maxHeight; i++) {
+           System.out.println(initialMap.get(i));
+        }
+        return new GameMap(maxWidth, maxHeight, destinations, undoLimit);
+        // throw new NotImplementedException();
     }
 
     /**
@@ -93,8 +148,28 @@ public class GameMap {
      */
     @Nullable
     public Entity getEntity(Position position) {
+        if(this.maxWidth<position.x() || this.maxHeight< position.y()){
+            return null;
+        } else {
+            char block = initialMap.get(position.y()).charAt(position.x());
+            switch (block) {
+                case '#':
+                    return new Wall();
+                case '.':
+                    return new Empty();
+                case '@':
+                    return new Empty();
+                default:
+                    if (Character.isUpperCase(block)) {
+                        return new Player(returnIdOfAlphabet(block));
+                    } else {
+                        return new Box(returnIdOfAlphabet(block));
+                    }
+            }
+        }
+
         // TODO
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     /**
@@ -158,5 +233,9 @@ public class GameMap {
         // TODO
         return this.maxHeight;
 
+    }
+
+    public static int returnIdOfAlphabet(char c) {
+        return (Character.isUpperCase(c)) ? c - 'A' : c - 'a';
     }
 }
