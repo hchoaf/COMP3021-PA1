@@ -1,0 +1,76 @@
+package hk.ust.comp3021.utils;
+
+public class TestMaps {
+    public static final String multiplePlayersMap = """
+        5
+        #####
+        #A..#
+        #..A#
+        #.a@#
+        #####
+            """;
+    public static final String multiplePlayersMapTwo = """
+        5
+        #####
+        #A.@#
+        #.B@#
+        #baB#
+        #####
+            """;
+    public static final String noPlayerMap = """
+        5
+        #####
+        #A.@#
+        #...#
+        #a..#
+        #####
+            """;
+    public static final String playerWithNoBoxMap = """
+        5
+        #####
+        #A..#
+        #..B#
+        #@a.#
+        #####
+            """;
+    public static final String boxWithNoPlayerMap = """
+        5
+        #####
+        #A..#
+        #.b@#
+        #@a.#
+        #####
+            """;
+    public static final String differentBoxAndDestinationMap = """
+        5
+        #####
+        #A..#
+        #..@#
+        #@a.#
+        #####
+            """;
+    public static final String differentBoxAndDestinationMapTwo = """
+        5
+        #####
+        #A..#
+        #..@#
+        #aa.#
+        #####
+            """;
+    public static final String noBoxMap = """
+        5
+        #####
+        #A..#
+        #..@#
+        #.@.#
+        #####
+            """;
+    public static final String noDestinationMap = """
+        5
+        #####
+        #A..#
+        #..a#
+        #.a.#
+        #####
+            """;
+}
