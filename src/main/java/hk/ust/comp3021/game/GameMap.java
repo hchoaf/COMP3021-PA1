@@ -20,21 +20,12 @@ import java.util.stream.IntStream;
  * GameBoard is capable to create many GameState instances, each representing an ongoing game.
  */
 public class GameMap {
-    private static int maxWidth;
-    private static int maxHeight;
-    private static Set<Position> destinations = new HashSet<Position>();
-    private static int undoLimit;
+    private int maxWidth;
+    private int maxHeight;
+    private Set<Position> destinations = new HashSet<Position>();
+    private int undoLimit;
 
-    private static Entity[][] entityMap;
-
-    // private static List<List<Entity>> entityMap = new ArrayList<>();
-    private static List<String> initialCharMap = new ArrayList<String>();
-    private static List<Integer> playerIds = new ArrayList<Integer>();
-
-    private static int boxNum;
-
-    private static List<Integer> boxIds = new ArrayList<Integer>();
-
+    private List<List<Entity>> entityMap = new ArrayList<>();
 
     /**
      * Create a new GameMap with width, height, set of box destinations and undo limit.
@@ -93,6 +84,7 @@ public class GameMap {
      */
     public static GameMap parse(String mapText) {
         // TODO
+        /*
         System.out.println("Before Parsing");
         System.out.println("-----------------------------");
         System.out.printf("MaxHeight: %d \n", maxHeight);
@@ -105,65 +97,30 @@ public class GameMap {
 
         System.out.println("=====================================");
 
+         */
+
         List<String> arr = new ArrayList<String>(Arrays.asList(mapText.split("\n")));
-        maxHeight = arr.size() - 1;
-        undoLimit = Integer.parseInt(arr.get(0));
+
+        int maxHeight = arr.size() - 1;
+        int undoLimit = Integer.parseInt(arr.get(0));
+        int maxWidth = 0;
+        Set<Position> destinations = new HashSet<Position>();
+        List<List<Entity>> entityMap = new ArrayList<>();
         arr.remove(0);
+
+        List<Integer> playerIds = new ArrayList<Integer>();
+        int boxNum = 0;
+        List<Integer> boxIds = new ArrayList<Integer>();
 
         for(int i = 0; i<arr.size(); i++){
             System.out.println(arr.get(i));
             maxWidth = Math.max(maxWidth, arr.get(i).length());
         }
-        entityMap = new Entity[maxHeight][maxWidth];
 
         for(int i = 0; i<arr.size(); i++){
+            entityMap.add(new ArrayList<Entity>());
             for(int j = 0; j<maxWidth; j++){
                 char block = (j >= arr.get(i).length()) ? ' ' : arr.get(i).charAt(j);
-                switch(block) {
-                    case '#':
-                        entityMap[i][j] = new Wall();
-                        break;
-                    case '.':
-                        entityMap[i][j] = new Empty();
-                        break;
-                    case ' ':
-                        entityMap[i][j] = null;
-                        break;
-                    case '@':
-                        entityMap[i][j] = new Empty();
-                        destinations.add(new Position(j, i));
-                        break;
-                    default:
-                        int playerId = returnIdOfAlphabet(block);
-                        if (Character.isUpperCase(block)) {
-                            if (!playerIds.contains(playerId)) {
-                                entityMap[i][j] = new Player(playerId);
-                                playerIds.add(playerId);
-                            } else {
-                                System.out.println("===============================");
-                                System.out.println(playerIds.toString());
-                                System.out.println(playerId);
-                                System.out.println("===============================");
-                                throw new IllegalArgumentException("There are multiple same upper-case letters. One player can only exist at one position.");
-                            }
-                        } else {
-                            if(!boxIds.contains(playerId)) {
-                                boxIds.add(playerId);
-                            }
-                            entityMap[i][j] = new Box(playerId);
-                            boxNum++;
-                        }
-
-                }
-            }
-        }
-        /*
-        for(int i = 0; i<arr.size(); i++) {
-            initialCharMap.add(arr.get(i));
-            maxWidth = Math.max(maxWidth, arr.get(i).length());
-            for(int j = 0; j<arr.get(i).length(); j++) {
-                entityMap.add(new ArrayList<>());
-                char block = arr.get(i).charAt(j);
                 switch(block) {
                     case '#':
                         entityMap.get(i).add(new Wall());
@@ -179,26 +136,31 @@ public class GameMap {
                         destinations.add(new Position(j, i));
                         break;
                     default:
+                        int playerId = returnIdOfAlphabet(block);
                         if (Character.isUpperCase(block)) {
-                            if (!playerIds.contains(returnIdOfAlphabet(block))) {
-                                entityMap.get(i).add(new Player(returnIdOfAlphabet(block)));
-                                playerIds.add(returnIdOfAlphabet(block));
+                            if (!playerIds.contains(playerId)) {
+                                entityMap.get(i).add(new Player(playerId));
+                                playerIds.add(playerId);
                             } else {
+                                System.out.println("===============================");
+                                System.out.println(playerIds.toString());
+                                System.out.println(playerId);
+                                System.out.println("===============================");
                                 throw new IllegalArgumentException("There are multiple same upper-case letters. One player can only exist at one position.");
                             }
                         } else {
-                            if (!boxIds.contains(returnIdOfAlphabet(block))) {
-                                boxIds.add(returnIdOfAlphabet(block));
+                            if(!boxIds.contains(playerId)) {
+                                boxIds.add(playerId);
                             }
-
-                            entityMap.get(i).add(new Box(returnIdOfAlphabet(block)));
+                            entityMap.get(i).add(new Box(playerId));
                             boxNum++;
                         }
+
                 }
             }
         }
-         */
 
+        /*
         System.out.println("-----------------------------");
         System.out.printf("MaxHeight: %d \n", maxHeight);
         System.out.printf("MaxWidth: %d \n", maxWidth);
@@ -209,7 +171,9 @@ public class GameMap {
         System.out.printf("bombPositions: %s \n", destinations.toString());
 
         System.out.println("=====================================");
-        printEntityMap();
+
+         */
+        // printEntityMap();
         if(playerIds.isEmpty()){
             throw new IllegalArgumentException("There is no player in the map.");
         }
@@ -219,7 +183,10 @@ public class GameMap {
         if(!boxIds.containsAll(playerIds) || !playerIds.containsAll(boxIds)) {
             throw new IllegalArgumentException("Either there is box with no player or player with no box.");
         }
-        return new GameMap(maxWidth, maxHeight, destinations, undoLimit);
+        GameMap gameMap = new GameMap(maxWidth, maxHeight, destinations, undoLimit);
+        gameMap.entityMap = entityMap;
+
+        return gameMap;
         // throw new NotImplementedException();
     }
 
@@ -232,9 +199,10 @@ public class GameMap {
     @Nullable
     public Entity getEntity(Position position) {
         if(this.maxWidth<position.x() || this.maxHeight< position.y()){
+            System.out.printf("X: %d, Y: %d", position.x(), position.y());
             throw new IllegalArgumentException("Position out of bound.");
         } else {
-            return entityMap[position.y()][position.x()];
+            return entityMap.get(position.y()).get(position.x());
         }
 
         // TODO
@@ -249,7 +217,7 @@ public class GameMap {
      */
     public void putEntity(Position position, Entity entity) {
         // TODO
-        entityMap[position.y()][position.x()] = entity;
+        entityMap.get(position.y()).set(position.x(), entity);
         throw new NotImplementedException();
     }
 
@@ -280,6 +248,14 @@ public class GameMap {
      * @return a set of player id.
      */
     public Set<Integer> getPlayerIds() {
+        var playerIds = new ArrayList<Integer>();
+        for(List<Entity> row : entityMap) {
+            for(Entity entity : row) {
+                if (entity instanceof Player) {
+                    playerIds.add(((Player) entity).getId());
+                }
+            }
+        }
         // TODO
         return new HashSet<Integer>(playerIds);
         // throw new NotImplementedException();
@@ -310,11 +286,11 @@ public class GameMap {
         return (Character.isUpperCase(c)) ? c - 'A' : c - 'a';
     }
 
-    private static void printEntityMap() {
+    private void printEntityMap() {
 
         for(int i = 0; i<maxHeight; i++){
             for(int j = 0; j<maxWidth; j++) {
-                var entity = entityMap[i][j];
+                var entity = entityMap.get(i).get(j);
                 if (entity instanceof Box) {
                     System.out.print(String.valueOf((char)(((Box) entity).getPlayerId()+'a')));
                 } else if (entity instanceof Player) {

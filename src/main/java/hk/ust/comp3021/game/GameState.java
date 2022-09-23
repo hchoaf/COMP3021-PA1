@@ -1,15 +1,12 @@
 package hk.ust.comp3021.game;
 
-import hk.ust.comp3021.entities.Entity;
+import hk.ust.comp3021.entities.*;
 import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * The state of the Sokoban Game.
@@ -25,8 +22,10 @@ import java.util.Set;
  */
 public class GameState {
 
-    List<Position> playerPositions = new ArrayList<Position>();
-
+    private int maxWidth;
+    private int maxHeight;
+    private Set<Position> destinations = new HashSet<Position>();
+    private  List<List<Entity>> entityMap = new ArrayList<>();
     Optional<Integer> undoQuotaLeft;
     /**
      * Create a running game state from a game map.
@@ -36,7 +35,18 @@ public class GameState {
     public GameState(@NotNull GameMap map) {
         // TODO
         this.undoQuotaLeft = map.getUndoLimit();
-        throw new NotImplementedException();
+        this.maxHeight = map.getMaxHeight();
+        this.maxWidth = map.getMaxWidth();
+        this.destinations = map.getDestinations();
+
+        for(int i = 0; i<this.maxHeight; i++) {
+            this.entityMap.add(new ArrayList<Entity>());
+            for(int j = 0; j<this.maxWidth; j++) {
+                this.entityMap.get(i).add(map.getEntity(new Position(j, i)));
+            }
+        }
+
+        // throw new NotImplementedException();
     }
 
     /**
@@ -47,7 +57,18 @@ public class GameState {
      */
     public @Nullable Position getPlayerPositionById(int id) {
         // TODO
-        throw new NotImplementedException();
+        for (int i = 0; i<maxHeight; i++) {
+            for (int j = 0; j<maxWidth; j++) {
+                if (entityMap.get(i).get(j) instanceof Player) {
+                    if (((Player) entityMap.get(i).get(j)).getId() == id) {
+                        return new Position(j, i);
+                    }
+                }
+            }
+        }
+        return null;
+        // throw new NotImplementedException();
+
     }
 
     /**
@@ -56,8 +77,19 @@ public class GameState {
      * @return a set of positions of all players.
      */
     public @NotNull Set<Position> getAllPlayerPositions() {
+        this.printEntityMap();
+        Set<Position> allPlayerPositions = new HashSet<>();
         // TODO
-        throw new NotImplementedException();
+        for (int i = 0; i<maxHeight; i++) {
+            for (int j = 0; j<maxWidth; j++) {
+                if (entityMap.get(i).get(j) instanceof Player) {
+                    System.out.printf("%d, %d\n", j, i);
+                    allPlayerPositions.add(new Position(j, i));
+                }
+            }
+        }
+        return allPlayerPositions;
+        // throw new NotImplementedException();
     }
 
     /**
@@ -68,7 +100,8 @@ public class GameState {
      */
     public @Nullable Entity getEntity(@NotNull Position position) {
         // TODO
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        return entityMap.get(position.y()).get(position.x());
     }
 
     /**
@@ -79,7 +112,8 @@ public class GameState {
      */
     public @NotNull @Unmodifiable Set<Position> getDestinations() {
         // TODO
-        throw new NotImplementedException();
+        return this.destinations;
+        // throw new NotImplementedException();
     }
 
     /**
@@ -90,9 +124,9 @@ public class GameState {
      * {@link Optional#empty()} if the game has unlimited undo.
      */
     public Optional<Integer> getUndoQuota() {
-
+        return this.undoQuotaLeft;
         // TODO
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     /**
@@ -152,7 +186,8 @@ public class GameState {
      */
     public int getMapMaxWidth() {
         // TODO
-        throw new NotImplementedException();
+        return this.maxWidth;
+        // throw new NotImplementedException();
     }
 
     /**
@@ -163,6 +198,33 @@ public class GameState {
      */
     public int getMapMaxHeight() {
         // TODO
-        throw new NotImplementedException();
+        return this.maxHeight;
+        // throw new NotImplementedException();
+    }
+
+
+    private void printEntityMap() {
+
+        for(int i = 0; i<maxHeight; i++){
+            for(int j = 0; j<maxWidth; j++) {
+                var entity = entityMap.get(i).get(j);
+                if (entity instanceof Box) {
+                    System.out.print(String.valueOf((char)(((Box) entity).getPlayerId()+'a')));
+                } else if (entity instanceof Player) {
+                    System.out.print(String.valueOf((char)(((Player) entity).getId()+'A')));
+                } else if (entity instanceof Empty) {
+                    if(destinations.contains(new Position(j, i))) {
+                        System.out.print("@");
+                    } else {
+                        System.out.print(".");
+                    }
+                } else if (entity == null) {
+                    System.out.print(" ");
+                } else if (entity instanceof Wall) {
+                    System.out.print("#");
+                }
+            }
+            System.out.println();
+        }
     }
 }

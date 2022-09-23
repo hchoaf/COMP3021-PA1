@@ -34,8 +34,9 @@ public abstract sealed class Move extends Action permits Move.Down, Move.Left, M
 
         @Override
         public @NotNull Position nextPosition(@NotNull Position currentPosition) {
-            // TODO
-            throw new NotImplementedException();
+            // TODO - attempt
+            // throw new NotImplementedException();
+            return new Position(currentPosition.x(), currentPosition.y()+1);
         }
     }
 
@@ -52,8 +53,9 @@ public abstract sealed class Move extends Action permits Move.Down, Move.Left, M
 
         @Override
         public @NotNull Position nextPosition(@NotNull Position currentPosition) {
-            // TODO
-            throw new NotImplementedException();
+            // TODO - attempt
+            // throw new NotImplementedException();
+            return new Position(currentPosition.x()-1, currentPosition.y());
         }
     }
 
@@ -70,8 +72,9 @@ public abstract sealed class Move extends Action permits Move.Down, Move.Left, M
 
         @Override
         public @NotNull Position nextPosition(@NotNull Position currentPosition) {
-            // TODO
-            throw new NotImplementedException();
+            // TODO - attempt
+            // throw new NotImplementedException();
+            return new Position(currentPosition.x()+1, currentPosition.y());
         }
     }
 
@@ -88,8 +91,10 @@ public abstract sealed class Move extends Action permits Move.Down, Move.Left, M
 
         @Override
         public @NotNull Position nextPosition(@NotNull Position currentPosition) {
-            // TODO
-            throw new NotImplementedException();
+            // TODO - attempt
+            // throw new NotImplementedException();
+
+            return new Position(currentPosition.x(), currentPosition.y()-1);
         }
     }
 }
