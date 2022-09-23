@@ -7,7 +7,7 @@
   <component name="JavadocGenerationManager">
     <option name="OUTPUT_DIRECTORY" value="$PROJECT_DIR$/../javadoc" />
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_18" project-jdk-name="18" project-jdk-type="JavaSDK" />
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_18_PREVIEW" project-jdk-name="18" project-jdk-type="JavaSDK" />
   <component name="ScalaSbtSettings">
     <option name="customVMPath" />
     <option name="vmParameters" value="-XX:+UseShenandoahGC" />

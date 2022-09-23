@@ -34,10 +34,10 @@ public class TerminalRenderingEngine implements RenderingEngine {
                 final var entity = state.getEntity(Position.of(x, y));
                 final var charToPrint = switch (entity) {
                     // TODO
-                    case Wall ignored -> throw new NotImplementedException();
-                    case Box b -> throw new NotImplementedException();
-                    case Player p -> throw new NotImplementedException();
-                    case Empty ignored -> throw new NotImplementedException();
+                    case Wall ignored -> '#';
+                    case Box b-> (char)(b.getPlayerId()+'a');
+                    case Player p -> (char)(p.getId() + 'A');
+                    case Empty ignored -> '.';
                     case null -> ' ';
                 };
                 builder.append(charToPrint);
@@ -51,6 +51,7 @@ public class TerminalRenderingEngine implements RenderingEngine {
     public void message(@NotNull String content) {
         // TODO
         // Hint: System.out is also a PrintStream.
-        throw new NotImplementedException();
+        outputSteam.println(content);
+        // throw new NotImplementedException();
     }
 }

@@ -16,33 +16,15 @@ class GameMapTest {
 
     private static final String rectangularMap = """
         233
-          ######
-          #A..@#
-          #...@#
-          #....#
-          #.a..#
-          #..a.#
-          ######
+        ######
+        #A..@#
+        #...@#
+        #....#
+        #.a..#
+        #..a.#
+        ######
         """;
 
-    private static final String nonRectangularMapOne = """
-        5
-         ######
-        ##...A#
-        #@aaa.#
-        #@@a.#
-        #.@..#
-        ######
-            """;
-
-    private static final String nonRectangularMapTwo = """
-        5
-        #####
-        #A..#
-         #.@.#
-        #.a.#
-        #####
-            """;
 
     @Tag(TestKind.PUBLIC)
     @Test
@@ -50,22 +32,6 @@ class GameMapTest {
         final var gameMap = TestHelper.parseGameMap(rectangularMap);
         assertEquals(6, gameMap.getMaxWidth());
     }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testWidthForNonRectangularMap() {
-        final var gameMap = TestHelper.parseGameMap(nonRectangularMapOne);
-        assertEquals(7, gameMap.getMaxWidth());
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testWidthForNonRectangularMapTwo() {
-        final var gameMapTwo = TestHelper.parseGameMap(nonRectangularMapTwo);
-        assertEquals(6, gameMapTwo.getMaxWidth());
-    }
-
-
 
     @Tag(TestKind.PUBLIC)
     @Test
@@ -121,68 +87,4 @@ class GameMapTest {
         final var entity = gameMap.getEntity(Position.of(0, 0));
         assertTrue(entity instanceof Wall);
     }
-/*
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testMultiplePlayers() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.multiplePlayersMap));
-        assertTrue(thrown.getMessage().contains("There are multiple same upper-case letters. One player can only exist at one position."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testMultiplePlayersTwo() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.multiplePlayersMapTwo));
-        assertTrue(thrown.getMessage().contains("There are multiple same upper-case letters. One player can only exist at one position."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testPlayerWithNoBox() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.playerWithNoBoxMap));
-        assertTrue(thrown.getMessage().contains("Either there is box with no player or player with no box."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testBoxWithNoPlayer() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.boxWithNoPlayerMap));
-        assertTrue(thrown.getMessage().contains("Either there is box with no player or player with no box."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testDifferentBoxAndDestination() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.differentBoxAndDestinationMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testDifferentBoxAndDestinationTwo() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.differentBoxAndDestinationMapTwo));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testNoBox() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noBoxMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testNoDestination() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noDestinationMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
-    }
-
-    @Tag(TestKind.PUBLIC)
-    @Test
-    void testNoPlayer() {
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noPlayerMap));
-        assertTrue(thrown.getMessage().contains("There is no player in the map."));
-    }
-*/
 }

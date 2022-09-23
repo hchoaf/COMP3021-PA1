@@ -1,7 +1,12 @@
 package hk.ust.comp3021.tui;
 
-import hk.ust.comp3021.actions.Action;
+import hk.ust.comp3021.actions.*;
+import hk.ust.comp3021.entities.Box;
+import hk.ust.comp3021.entities.Empty;
+import hk.ust.comp3021.entities.Player;
+import hk.ust.comp3021.entities.Wall;
 import hk.ust.comp3021.game.InputEngine;
+import hk.ust.comp3021.game.Position;
 import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,9 +39,48 @@ public class TerminalInputEngine implements InputEngine {
     public @NotNull Action fetchAction() {
         // This is an example showing how to read a line from the Scanner class.
         // Feel free to change it if you do not like it.
-        final var inputLine = terminalScanner.nextLine();
+        if (terminalScanner.hasNextLine()) {
+            final var inputLine = terminalScanner.nextLine();
+            switch (inputLine.toLowerCase()) {
+                case "exit" -> {
+                    return new Exit(-1);
+                }
+                case "a" -> {
+                    return new Move.Left(0);
+                }
+                case "s" -> {
+                    return new Move.Down(0);
+                }
+                case "d" -> {
+                    return new Move.Right(0);
+                }
+                case "w" -> {
+                    return new Move.Up(0);
+                }
+                case "h" -> {
+                    return new Move.Left(1);
+                }
+                case "j" -> {
+                    return new Move.Down(1);
+                }
+                case "k" -> {
+                    return new Move.Right(1);
+                }
+                case "l" -> {
+                    return new Move.Up(1);
+                }
+                case "u" -> {
+                    return new Undo(-1);
+                }
+                default -> {
+                    return new InvalidInput(-1, "Invalid Input.");
+                }
+            }
+        } else{
+            return new InvalidInput(-1, "Invalid Input.");
+        }
 
         // TODO
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 }

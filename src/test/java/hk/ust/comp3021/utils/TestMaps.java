@@ -20,7 +20,7 @@ public class TestMaps {
     public static final String noPlayerMap = """
         5
         #####
-        #A.@#
+        #..@#
         #...#
         #a..#
         #####

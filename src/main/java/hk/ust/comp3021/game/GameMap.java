@@ -93,6 +93,17 @@ public class GameMap {
      */
     public static GameMap parse(String mapText) {
         // TODO
+        System.out.println("Before Parsing");
+        System.out.println("-----------------------------");
+        System.out.printf("MaxHeight: %d \n", maxHeight);
+        System.out.printf("MaxWidth: %d \n", maxWidth);
+        System.out.printf("UndoLimit: %d \n", undoLimit);
+        System.out.printf("boxNum: %d \n", boxNum);
+        System.out.printf("PlayerIds: %s \n", playerIds.toString());
+        System.out.printf("boxIds: %s \n", boxIds.toString());
+        System.out.printf("bombPositions: %s \n", destinations.toString());
+
+        System.out.println("=====================================");
 
         List<String> arr = new ArrayList<String>(Arrays.asList(mapText.split("\n")));
         maxHeight = arr.size() - 1;
@@ -129,6 +140,10 @@ public class GameMap {
                                 entityMap[i][j] = new Player(playerId);
                                 playerIds.add(playerId);
                             } else {
+                                System.out.println("===============================");
+                                System.out.println(playerIds.toString());
+                                System.out.println(playerId);
+                                System.out.println("===============================");
                                 throw new IllegalArgumentException("There are multiple same upper-case letters. One player can only exist at one position.");
                             }
                         } else {
@@ -201,7 +216,7 @@ public class GameMap {
         if(boxNum != destinations.size()){
             throw new IllegalArgumentException("The number of boxes is not equal to the number of destinations.");
         }
-        if(!boxIds.containsAll(playerIds)) {
+        if(!boxIds.containsAll(playerIds) || !playerIds.containsAll(boxIds)) {
             throw new IllegalArgumentException("Either there is box with no player or player with no box.");
         }
         return new GameMap(maxWidth, maxHeight, destinations, undoLimit);

@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -23,6 +25,9 @@ import java.util.Set;
  */
 public class GameState {
 
+    List<Position> playerPositions = new ArrayList<Position>();
+
+    Optional<Integer> undoQuotaLeft;
     /**
      * Create a running game state from a game map.
      *
@@ -30,6 +35,7 @@ public class GameState {
      */
     public GameState(@NotNull GameMap map) {
         // TODO
+        this.undoQuotaLeft = map.getUndoLimit();
         throw new NotImplementedException();
     }
 
@@ -84,6 +90,7 @@ public class GameState {
      * {@link Optional#empty()} if the game has unlimited undo.
      */
     public Optional<Integer> getUndoQuota() {
+
         // TODO
         throw new NotImplementedException();
     }
