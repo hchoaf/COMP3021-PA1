@@ -117,6 +117,8 @@ public class GameMap {
             maxWidth = Math.max(maxWidth, arr.get(i).length());
         }
 
+
+
         for(int i = 0; i<arr.size(); i++){
             entityMap.add(new ArrayList<Entity>());
             for(int j = 0; j<maxWidth; j++){
@@ -133,7 +135,7 @@ public class GameMap {
                         break;
                     case '@':
                         entityMap.get(i).add(new Empty());
-                        destinations.add(new Position(j, i));
+                        destinations.add(Position.of(j, i));
                         break;
                     default:
                         int playerId = returnIdOfAlphabet(block);
@@ -296,7 +298,7 @@ public class GameMap {
                 } else if (entity instanceof Player) {
                     System.out.print(String.valueOf((char)(((Player) entity).getId()+'A')));
                 } else if (entity instanceof Empty) {
-                    if(destinations.contains(new Position(j, i))) {
+                    if(destinations.contains(Position.of(j, i))) {
                         System.out.print("@");
                     } else {
                         System.out.print(".");

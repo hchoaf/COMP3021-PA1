@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.InputStream;
 import java.util.Scanner;
 
+import static hk.ust.comp3021.utils.StringResources.INVALID_INPUT_MESSAGE;
+
 /**
  * An input engine that fetches actions from terminal input.
  */
@@ -73,11 +75,11 @@ public class TerminalInputEngine implements InputEngine {
                     return new Undo(-1);
                 }
                 default -> {
-                    return new InvalidInput(-1, "Invalid Input.");
+                    return new InvalidInput(-1, INVALID_INPUT_MESSAGE);
                 }
             }
         } else{
-            return new InvalidInput(-1, "Invalid Input.");
+            return new InvalidInput(-1, INVALID_INPUT_MESSAGE);
         }
 
         // TODO

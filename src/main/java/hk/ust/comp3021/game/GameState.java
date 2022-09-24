@@ -26,7 +26,14 @@ public class GameState {
     private int maxHeight;
     private Set<Position> destinations = new HashSet<Position>();
     private  List<List<Entity>> entityMap = new ArrayList<>();
+
+    private final Set<Position> initialDestinations;
+    private final List<List<Entity>> initialMap;
     Optional<Integer> undoQuotaLeft;
+
+    final Optional<Integer> initialUndoQuotaLeft;
+
+    private List<GameState> checkPoints = new ArrayList<>();
     /**
      * Create a running game state from a game map.
      *
@@ -38,15 +45,50 @@ public class GameState {
         this.maxHeight = map.getMaxHeight();
         this.maxWidth = map.getMaxWidth();
         this.destinations = map.getDestinations();
-
+        this.initialMap = new ArrayList<>();
         for(int i = 0; i<this.maxHeight; i++) {
-            this.entityMap.add(new ArrayList<Entity>());
+            this.initialMap.add(new ArrayList<Entity>());
+            Player player = new Player(1);
+
             for(int j = 0; j<this.maxWidth; j++) {
-                this.entityMap.get(i).add(map.getEntity(new Position(j, i)));
+                this.initialMap.get(i).add(map.getEntity(Position.of(j, i)));
+            }
+        }
+        this.entityMap.addAll(initialMap);
+        this.initialDestinations = this.destinations;
+        this.initialUndoQuotaLeft = this.undoQuotaLeft;
+
+        // throw new NotImplementedException();
+    }
+
+    public GameState(GameState prevState) {
+        this.maxWidth = prevState.maxWidth;
+        this.maxHeight = prevState.maxHeight;
+
+        this.entityMap.addAll(prevState.entityMap);
+        this.entityMap = new ArrayList<>();
+        for(int i = 0; i<maxHeight; i++) {
+            this.entityMap.add(new ArrayList<Entity>());
+            for (int j = 0; j<maxWidth; j++) {
+                this.entityMap.get(i).add(new En)
+            }
+        }
+        for (List<Entity> row : prevState.entityMap) {
+            for (Entity entity : row) {
+                entityMap.
+            }
+        }
+        this.destinations = prevState.destinations;
+        this.undoQuotaLeft = prevState.undoQuotaLeft;
+        if (! prevState.checkPoints.isEmpty()) {
+            for(GameState checkPoint : prevState.checkPoints) {
+                this.checkPoints.add(new GameState(checkPoint));
             }
         }
 
-        // throw new NotImplementedException();
+        this.initialMap = prevState.initialMap;
+        this.initialDestinations = prevState.initialDestinations;
+        this.initialUndoQuotaLeft = prevState.initialUndoQuotaLeft;
     }
 
     /**
@@ -61,7 +103,7 @@ public class GameState {
             for (int j = 0; j<maxWidth; j++) {
                 if (entityMap.get(i).get(j) instanceof Player) {
                     if (((Player) entityMap.get(i).get(j)).getId() == id) {
-                        return new Position(j, i);
+                        return Position.of(j, i);
                     }
                 }
             }
@@ -84,7 +126,7 @@ public class GameState {
             for (int j = 0; j<maxWidth; j++) {
                 if (entityMap.get(i).get(j) instanceof Player) {
                     System.out.printf("%d, %d\n", j, i);
-                    allPlayerPositions.add(new Position(j, i));
+                    allPlayerPositions.add(Position.of(j, i));
                 }
             }
         }
@@ -136,8 +178,14 @@ public class GameState {
      * @return true is the game wins.
      */
     public boolean isWin() {
-// TODO
-        throw new NotImplementedException();
+        // TODO
+        for (Position position : this.destinations) {
+            if (!(this.entityMap.get(position.y()).get(position.x()) instanceof Box)) {
+                return false;
+            }
+        }
+        return true;
+        // throw new NotImplementedException();
     }
 
     /**
@@ -150,7 +198,9 @@ public class GameState {
      */
     public void move(Position from, Position to) {
         // TODO
-        throw new NotImplementedException();
+        this.entityMap.get(to.y()).set(to.x(), entityMap.get(from.y()).get(from.x()));
+        this.entityMap.get(from.y()).set(from.x(), new Empty());
+        // throw new NotImplementedException();
     }
 
     /**
@@ -163,7 +213,8 @@ public class GameState {
      */
     public void checkpoint() {
         // TODO
-        throw new NotImplementedException();
+        this.checkPoints.add(new GameState(this));
+        // throw new NotImplementedException();
     }
 
     /**
@@ -175,7 +226,23 @@ public class GameState {
      */
     public void undo() {
         // TODO
-        throw new NotImplementedException();
+        if (checkPoints.isEmpty() || checkPoints.size() == 1) {
+            this.entityMap = this.initialMap;
+            this.undoQuotaLeft = this.initialUndoQuotaLeft;
+            this.destinations = this.initialDestinations;
+        } else if (checkPoints.size() == 1) {
+            this.entityMap = this.initialMap;
+            if (this.undoQuotaLeft.isPresent()) {
+                this.undoQuotaLeft = Optional.of(this.undoQuotaLeft.get() - 1);
+            }
+            this.destinations = this.initialDestinations;
+        } else {
+
+            this.maxHeight = this.checkPoints.get(checkPoints.size() - 2).maxHeight;
+            this.maxWidth = this.checkPoints.get(checkPoints.size() - 2).maxWidth;
+            this.destinations = this.checkPoints.get(checkPoints.size() - 2).destinations;
+        }
+        // throw new NotImplementedException();
     }
 
     /**
@@ -203,7 +270,8 @@ public class GameState {
     }
 
 
-    private void printEntityMap() {
+    public void printEntityMap() {
+        System.out.println("---------------------");
 
         for(int i = 0; i<maxHeight; i++){
             for(int j = 0; j<maxWidth; j++) {
@@ -213,7 +281,7 @@ public class GameState {
                 } else if (entity instanceof Player) {
                     System.out.print(String.valueOf((char)(((Player) entity).getId()+'A')));
                 } else if (entity instanceof Empty) {
-                    if(destinations.contains(new Position(j, i))) {
+                    if(destinations.contains(Position.of(j, i))) {
                         System.out.print("@");
                     } else {
                         System.out.print(".");
