@@ -22,16 +22,16 @@ import java.util.*;
  */
 public class GameState {
 
-    private int maxWidth;
-    private int maxHeight;
+    private final int maxWidth;
+    private final int maxHeight;
     private Set<Position> destinations = new HashSet<Position>();
-    private  List<List<Entity>> entityMap = new ArrayList<>();
+    private Entity[][] entityMap;
+    private final Entity[][] initialEntityMap;
 
     private final Set<Position> initialDestinations;
-    private final List<List<Entity>> initialMap;
     Optional<Integer> undoQuotaLeft;
 
-    final Optional<Integer> initialUndoQuotaLeft;
+    private final Optional<Integer> initialUndoQuotaLeft;
 
     private List<GameState> checkPoints = new ArrayList<>();
     /**
@@ -44,18 +44,34 @@ public class GameState {
         this.undoQuotaLeft = map.getUndoLimit();
         this.maxHeight = map.getMaxHeight();
         this.maxWidth = map.getMaxWidth();
-        this.destinations = map.getDestinations();
-        this.initialMap = new ArrayList<>();
-        for(int i = 0; i<this.maxHeight; i++) {
-            this.initialMap.add(new ArrayList<Entity>());
-            Player player = new Player(1);
+        this.destinations = new HashSet<>(map.getDestinations());
 
+        this.entityMap = new Entity[this.maxHeight][this.maxWidth];
+        this.initialEntityMap = new Entity[this.maxHeight][this.maxWidth];
+        for(int i = 0; i<this.maxHeight; i++) {
             for(int j = 0; j<this.maxWidth; j++) {
-                this.initialMap.get(i).add(map.getEntity(Position.of(j, i)));
+                Entity entity = map.getEntity(Position.of(j, i));
+                if (entity == null) {
+                    entityMap[i][j] = null;
+                    initialEntityMap[i][j] = null;
+                }else if (entity instanceof Wall) {
+                    entityMap[i][j] = new Wall();
+                    initialEntityMap[i][j] = new Wall();
+                } else if (entity instanceof Player) {
+                    entityMap[i][j] = new Player(((Player) entity).getId());
+                    initialEntityMap[i][j] = new Player(((Player) entity).getId());
+                } else if (entity instanceof Box) {
+                    entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                    initialEntityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                } else if (entity instanceof Empty) {
+                    entityMap[i][j] = new Empty();
+                    initialEntityMap[i][j] = new Empty();
+                }
             }
         }
-        this.entityMap.addAll(initialMap);
-        this.initialDestinations = this.destinations;
+
+
+        this.initialDestinations = new HashSet<>(this.destinations);
         this.initialUndoQuotaLeft = this.undoQuotaLeft;
 
         // throw new NotImplementedException();
@@ -64,31 +80,42 @@ public class GameState {
     public GameState(GameState prevState) {
         this.maxWidth = prevState.maxWidth;
         this.maxHeight = prevState.maxHeight;
+        this.entityMap = new Entity[this.maxHeight][this.maxWidth];
+        this.initialEntityMap = new Entity[this.maxHeight][this.maxWidth];
+        for(int i = 0; i<this.maxHeight; i++) {
+            for(int j = 0; j<this.maxWidth; j++) {
+                Entity entity = prevState.getEntity(Position.of(j, i));
+                if (entity == null) {
+                    entityMap[i][j] = null;
+                    initialEntityMap[i][j] = null;
+                }else if (entity instanceof Wall) {
+                    entityMap[i][j] = new Wall();
+                    initialEntityMap[i][j] = new Wall();
+                } else if (entity instanceof Player) {
+                    entityMap[i][j] = new Player(((Player) entity).getId());
+                    initialEntityMap[i][j] = new Player(((Player) entity).getId());
+                } else if (entity instanceof Box) {
+                    entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                    initialEntityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                } else if (entity instanceof Empty) {
+                    entityMap[i][j] = new Empty();
+                    initialEntityMap[i][j] = new Empty();
+                }
+            }
+        }
+        this.destinations = new HashSet<>(prevState.destinations);
+        this.initialDestinations = new HashSet<>(prevState.initialDestinations);
 
-        this.entityMap.addAll(prevState.entityMap);
-        this.entityMap = new ArrayList<>();
-        for(int i = 0; i<maxHeight; i++) {
-            this.entityMap.add(new ArrayList<Entity>());
-            for (int j = 0; j<maxWidth; j++) {
-                this.entityMap.get(i).add(new En)
-            }
-        }
-        for (List<Entity> row : prevState.entityMap) {
-            for (Entity entity : row) {
-                entityMap.
-            }
-        }
-        this.destinations = prevState.destinations;
         this.undoQuotaLeft = prevState.undoQuotaLeft;
+        this.initialUndoQuotaLeft = prevState.initialUndoQuotaLeft;
+
+
         if (! prevState.checkPoints.isEmpty()) {
             for(GameState checkPoint : prevState.checkPoints) {
                 this.checkPoints.add(new GameState(checkPoint));
             }
         }
 
-        this.initialMap = prevState.initialMap;
-        this.initialDestinations = prevState.initialDestinations;
-        this.initialUndoQuotaLeft = prevState.initialUndoQuotaLeft;
     }
 
     /**
@@ -101,8 +128,8 @@ public class GameState {
         // TODO
         for (int i = 0; i<maxHeight; i++) {
             for (int j = 0; j<maxWidth; j++) {
-                if (entityMap.get(i).get(j) instanceof Player) {
-                    if (((Player) entityMap.get(i).get(j)).getId() == id) {
+                if (entityMap[i][j] instanceof Player) {
+                    if (((Player) entityMap[i][j]).getId() == id) {
                         return Position.of(j, i);
                     }
                 }
@@ -119,19 +146,30 @@ public class GameState {
      * @return a set of positions of all players.
      */
     public @NotNull Set<Position> getAllPlayerPositions() {
-        this.printEntityMap();
+        // this.printEntityMap();
         Set<Position> allPlayerPositions = new HashSet<>();
         // TODO
         for (int i = 0; i<maxHeight; i++) {
             for (int j = 0; j<maxWidth; j++) {
-                if (entityMap.get(i).get(j) instanceof Player) {
-                    System.out.printf("%d, %d\n", j, i);
+                if (entityMap[i][j] instanceof Player) {
                     allPlayerPositions.add(Position.of(j, i));
                 }
             }
         }
         return allPlayerPositions;
         // throw new NotImplementedException();
+    }
+
+    public Set<Integer> getAllPlayerIds() {
+        Set<Integer> allPlayerIds = new HashSet<>();
+        for (Entity[] row : entityMap) {
+            for (Entity entity : row) {
+                if (entity instanceof Player) {
+                    allPlayerIds.add(((Player) entity).getId());
+                }
+            }
+        }
+        return allPlayerIds;
     }
 
     /**
@@ -143,7 +181,7 @@ public class GameState {
     public @Nullable Entity getEntity(@NotNull Position position) {
         // TODO
         // throw new NotImplementedException();
-        return entityMap.get(position.y()).get(position.x());
+        return entityMap[position.y()][position.x()];
     }
 
     /**
@@ -180,7 +218,7 @@ public class GameState {
     public boolean isWin() {
         // TODO
         for (Position position : this.destinations) {
-            if (!(this.entityMap.get(position.y()).get(position.x()) instanceof Box)) {
+            if (!((this.entityMap[position.y()][position.x()]) instanceof Box)) {
                 return false;
             }
         }
@@ -198,8 +236,8 @@ public class GameState {
      */
     public void move(Position from, Position to) {
         // TODO
-        this.entityMap.get(to.y()).set(to.x(), entityMap.get(from.y()).get(from.x()));
-        this.entityMap.get(from.y()).set(from.x(), new Empty());
+        this.entityMap[to.y()][to.x()] = this.entityMap[from.y()][from.x()];
+        this.entityMap[from.y()][from.x()] = new Empty();
         // throw new NotImplementedException();
     }
 
@@ -226,6 +264,74 @@ public class GameState {
      */
     public void undo() {
         // TODO
+        if (checkPoints.isEmpty()) {
+            // change everything to initial
+            for (int i = 0; i<this.maxHeight; i++) {
+                for (int j = 0; j<this.maxWidth; j++) {
+                    var entity = this.initialEntityMap[i][j];
+                    if (entity == null) {
+                        entityMap[i][j] = null;
+                    } else if (entity instanceof Wall) {
+                        entityMap[i][j] = new Wall();
+                    } else if (entity instanceof Empty) {
+                        entityMap[i][j] = new Empty();
+                    } else if (entity instanceof Player) {
+                        entityMap[i][j] = new Player(((Player) entity).getId());
+                    } else if (entity instanceof Box) {
+                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                    }
+                }
+            }
+            // this.destinations = new HashSet<>(destinations);
+        } else if (checkPoints.size() == 1) {
+            // change everything to initial except; undoquotaleft-- , empty checkpoints
+            for (int i = 0; i<this.maxHeight; i++) {
+                for (int j = 0; j<this.maxWidth; j++) {
+                    var entity = this.initialEntityMap[i][j];
+                    if (entity == null) {
+                        entityMap[i][j] = null;
+                    } else if (entity instanceof Wall) {
+                        entityMap[i][j] = new Wall();
+                    } else if (entity instanceof Empty) {
+                        entityMap[i][j] = new Empty();
+                    } else if (entity instanceof Player) {
+                        entityMap[i][j] = new Player(((Player) entity).getId());
+                    } else if (entity instanceof Box) {
+                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                    }
+                }
+            }
+            // this.destinations = new HashSet<>(destinations);
+            this.checkPoints.clear();
+            this.undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+        } else {
+            // Copy entrymap, destinations, checkpoints from checkpoint ; undoquotleft --
+            GameState checkPoint = this.checkPoints.get(checkPoints.size() - 2);
+            for (int i = 0; i<this.maxHeight; i++) {
+                for (int j = 0; j<this.maxWidth; j++) {
+                    var entity = checkPoint.getEntity(Position.of(j, i));
+                    if (entity == null) {
+                        entityMap[i][j] = null;
+                    } else if (entity instanceof Wall) {
+                        entityMap[i][j] = new Wall();
+                    } else if (entity instanceof Empty) {
+                        entityMap[i][j] = new Empty();
+                    } else if (entity instanceof Player) {
+                        entityMap[i][j] = new Player(((Player) entity).getId());
+                    } else if (entity instanceof Box) {
+                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                    }
+                }
+            }
+            this.destinations = new HashSet<>(checkPoint.getDestinations());
+            this.checkPoints = null;
+            for (GameState state : checkPoint.checkPoints) {
+                this.checkPoints.add(new GameState(state));
+            }
+            this.undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+
+        }
+        /*
         if (checkPoints.isEmpty() || checkPoints.size() == 1) {
             this.entityMap = this.initialMap;
             this.undoQuotaLeft = this.initialUndoQuotaLeft;
@@ -242,6 +348,8 @@ public class GameState {
             this.maxWidth = this.checkPoints.get(checkPoints.size() - 2).maxWidth;
             this.destinations = this.checkPoints.get(checkPoints.size() - 2).destinations;
         }
+
+         */
         // throw new NotImplementedException();
     }
 
@@ -275,7 +383,7 @@ public class GameState {
 
         for(int i = 0; i<maxHeight; i++){
             for(int j = 0; j<maxWidth; j++) {
-                var entity = entityMap.get(i).get(j);
+                var entity = entityMap[i][j];
                 if (entity instanceof Box) {
                     System.out.print(String.valueOf((char)(((Box) entity).getPlayerId()+'a')));
                 } else if (entity instanceof Player) {

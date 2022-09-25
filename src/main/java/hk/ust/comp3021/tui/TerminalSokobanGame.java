@@ -1,6 +1,7 @@
 package hk.ust.comp3021.tui;
 
 
+import hk.ust.comp3021.actions.ActionResult;
 import hk.ust.comp3021.game.AbstractSokobanGame;
 import hk.ust.comp3021.game.GameState;
 import hk.ust.comp3021.game.InputEngine;
@@ -30,14 +31,30 @@ public class TerminalSokobanGame extends AbstractSokobanGame {
         super(gameState);
         this.inputEngine = inputEngine;
         this.renderingEngine = renderingEngine;
+        if (gameState.getAllPlayerIds().size() > 2) {
+            System.out.println(gameState.getAllPlayerIds().toString());
+            throw new IllegalArgumentException("There are more than two players in the map");
+        }
         // TODO
         // Check the number of players
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
     }
 
     @Override
     public void run() {
         // TODO
-        throw new NotImplementedException();
+        // throw new NotImplementedException();
+        while (!super.shouldStop()) {
+            System.out.println("wowoww");
+            renderingEngine.render(this.state);
+            var action = inputEngine.fetchAction();
+            var actionResult = processAction(action);
+            if (actionResult instanceof ActionResult.Failed) {
+                renderingEngine.message(((ActionResult.Failed) actionResult).getReason());
+            } else if (actionResult instanceof ActionResult.Success) {
+
+            }
+            // renderingEngine.
+        }
     }
 }

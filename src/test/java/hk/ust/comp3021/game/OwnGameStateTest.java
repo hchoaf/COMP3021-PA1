@@ -12,7 +12,7 @@ import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class GameStateTest {
+class OwnGameStateTest {
 
     @Tag(TestKind.PUBLIC)
     @Test
@@ -109,13 +109,36 @@ class GameStateTest {
         gameState.move(Position.of(3, 1), Position.of(4, 1));
         gameState.move(Position.of(2, 1), Position.of(3, 1));
         gameState.checkpoint();
-
         gameState.undo();
         assertEquals(Position.of(2, 1), gameState.getPlayerPositionById(0));
         assertInstanceOf(Box.class, gameState.getEntity(Position.of(3, 1)));
         assertInstanceOf(Empty.class, gameState.getEntity(Position.of(4, 1)));
 
         assertEquals(232, gameState.getUndoQuota().orElse(null));
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testCopy() {
+        final var gameState = new GameState(TestHelper.parseGameMap("""
+            233
+            ######
+            #.Aa@#
+            #..a@#
+            ######
+            """
+        ));
+        var newGameState = new GameState(gameState);
+        System.out.println("old game state");
+        gameState.printEntityMap();
+        System.out.println("new game state");
+        newGameState.printEntityMap();
+        gameState.move(Position.of(3, 1), Position.of(4, 1));
+        gameState.move(Position.of(2, 1), Position.of(3, 1));
+        System.out.println("old game state");
+        gameState.printEntityMap();
+        System.out.println("new game state");
+        newGameState.printEntityMap();
     }
 
 }
