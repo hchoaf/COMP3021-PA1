@@ -104,7 +104,6 @@ class OwnTerminalInputEngineTest {
             var inputStream = fixValueStream(invalidInput);
             var inputEngine = new TerminalInputEngine(inputStream);
             var action = inputEngine.fetchAction();
-            System.out.println(invalidInput);
             assertTrue(action instanceof InvalidInput);
 
         }

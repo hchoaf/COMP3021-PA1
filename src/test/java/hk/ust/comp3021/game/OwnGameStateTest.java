@@ -151,26 +151,35 @@ class OwnGameStateTest {
 
     @Tag(TestKind.PUBLIC)
     @Test
-    void testCopy() {
+    void testUndoWhenThereIsCheckpointTwo() {
         final var gameState = new GameState(TestHelper.parseGameMap("""
-            233
+            5
             ######
-            #.Aa@#
-            #..a@#
+            #Aa.@#
+            #a...#
+            #....#
+            #@...#
             ######
             """
         ));
-        var newGameState = new GameState(gameState);
-        System.out.println("old game state");
-        gameState.printEntityMap();
-        System.out.println("new game state");
-        newGameState.printEntityMap();
-        gameState.move(Position.of(3, 1), Position.of(4, 1));
+
         gameState.move(Position.of(2, 1), Position.of(3, 1));
-        System.out.println("old game state");
+        gameState.move(Position.of(1, 1), Position.of(2, 1));
+        gameState.checkpoint();
         gameState.printEntityMap();
-        System.out.println("new game state");
-        newGameState.printEntityMap();
+        gameState.move(Position.of(2, 1), Position.of(1, 1));
+        gameState.move(Position.of(1, 2), Position.of(1, 3));
+        gameState.checkpoint();
+        gameState.move(Position.of(1, 1), Position.of(1, 2));
+        // gameState.undo();
+        gameState.printEntityMap();
+        gameState.undo();
+        gameState.printEntityMap();
+        assertEquals(Position.of(2, 1), gameState.getPlayerPositionById(0));
+        assertInstanceOf(Box.class, gameState.getEntity(Position.of(3, 1)));
+        assertInstanceOf(Box.class, gameState.getEntity(Position.of(1, 2)));
+        assertEquals(4, gameState.getUndoQuota().orElse(null));
     }
+
 
 }

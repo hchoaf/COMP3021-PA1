@@ -57,7 +57,6 @@ public class OwnGameMapTest {
     @Test
     void testBoxWithNoPlayer() {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.boxWithNoPlayerMap));
-        System.out.println(thrown.getMessage());
         assertTrue(thrown.getMessage().contains("unmatched players"));
     }
 

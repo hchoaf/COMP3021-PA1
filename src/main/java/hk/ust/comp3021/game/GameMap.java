@@ -170,7 +170,6 @@ public class GameMap {
     @Nullable
     public Entity getEntity(Position position) {
         if(this.maxWidth<position.x() || this.maxHeight< position.y()){
-            System.out.printf("X: %d, Y: %d", position.x(), position.y());
             throw new IllegalArgumentException("Position out of bound.");
         } else {
             return entityMap[position.y()][position.x()];

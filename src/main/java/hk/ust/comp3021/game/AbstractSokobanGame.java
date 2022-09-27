@@ -3,6 +3,7 @@ package hk.ust.comp3021.game;
 import hk.ust.comp3021.actions.*;
 import hk.ust.comp3021.entities.Box;
 import hk.ust.comp3021.entities.Empty;
+import hk.ust.comp3021.entities.Wall;
 import org.jetbrains.annotations.NotNull;
 
 import static hk.ust.comp3021.utils.StringResources.*;
@@ -74,8 +75,10 @@ public abstract class AbstractSokobanGame implements SokobanGame {
                         return new ActionResult.Failed(action, "Failed to push the box");
                     }
                 }
-            } else {
+            } else if (targetEntity instanceof Wall){
                 return new ActionResult.Failed(action, "You hit a wall.");
+            } else {
+                return new ActionResult.Failed(action, "You hit a another player.");
             }
 
         } else if (action instanceof Undo) {

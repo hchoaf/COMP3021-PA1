@@ -27,12 +27,13 @@ public class GameState {
     private Entity[][] entityMap;
     private final Entity[][] initialEntityMap;
 
+    private int currentCheckPoint;
+
     private final Set<Position> initialDestinations;
-    private static Optional<Integer> undoQuotaLeft;
+    private Optional<Integer> undoQuotaLeft;
 
-    private final Optional<Integer> initialUndoQuotaLeft;
 
-    private List<GameState> checkPoints = new ArrayList<>();
+    List<Entity[][]> checkPoints = new ArrayList<>();
     /**
      * Create a running game state from a game map.
      *
@@ -71,7 +72,6 @@ public class GameState {
 
 
         this.initialDestinations = new HashSet<>(this.destinations);
-        this.initialUndoQuotaLeft = this.undoQuotaLeft;
 
         // throw new NotImplementedException();
     }
@@ -106,12 +106,28 @@ public class GameState {
         this.initialDestinations = new HashSet<>(prevState.initialDestinations);
 
         this.undoQuotaLeft = prevState.undoQuotaLeft;
-        this.initialUndoQuotaLeft = prevState.initialUndoQuotaLeft;
 
 
         if (! prevState.checkPoints.isEmpty()) {
-            for(GameState checkPoint : prevState.checkPoints) {
-                this.checkPoints.add(new GameState(checkPoint));
+            for (Entity[][] checkPointMap: prevState.checkPoints) {
+                var tempMap = new Entity[maxHeight][maxWidth];
+                for(int i = 0; i<this.maxHeight; i++) {
+                    for(int j = 0; j<this.maxWidth; j++) {
+                        Entity entity = checkPointMap[i][j];
+                        if (entity == null) {
+                            tempMap[i][j] = null;
+                        }else if (entity instanceof Wall) {
+                            tempMap[i][j] = new Wall();
+                        } else if (entity instanceof Player) {
+                            tempMap[i][j] = new Player(((Player) entity).getId());
+                        } else if (entity instanceof Box) {
+                            tempMap[i][j] = new Box(((Box) entity).getPlayerId());
+                        } else if (entity instanceof Empty) {
+                            tempMap[i][j] = new Empty();
+                        }
+                    }
+                }
+                this.checkPoints.add(tempMap);
             }
         }
 
@@ -203,8 +219,8 @@ public class GameState {
      * {@link Optional#empty()} if the game has unlimited undo.
      */
     public Optional<Integer> getUndoQuota() {
-        if (undoQuotaLeft.get() >= 0) {
-            return Optional.of(undoQuotaLeft.get());
+        if (this.undoQuotaLeft.get() >= 0) {
+            return Optional.of(this.undoQuotaLeft.get());
         } else {
             return Optional.empty();
         }
@@ -254,7 +270,25 @@ public class GameState {
      */
     public void checkpoint() {
         // TODO
-        this.checkPoints.add(new GameState(this));
+        var tempMap = new Entity[maxHeight][maxWidth];
+        for(int i = 0; i<this.maxHeight; i++) {
+            for(int j = 0; j<this.maxWidth; j++) {
+                Entity entity = this.entityMap[i][j];
+                if (entity == null) {
+                    tempMap[i][j] = null;
+                }else if (entity instanceof Wall) {
+                    tempMap[i][j] = new Wall();
+                } else if (entity instanceof Player) {
+                    tempMap[i][j] = new Player(((Player) entity).getId());
+                } else if (entity instanceof Box) {
+                    tempMap[i][j] = new Box(((Box) entity).getPlayerId());
+                } else if (entity instanceof Empty) {
+                    tempMap[i][j] = new Empty();
+                }
+            }
+        }
+        this.checkPoints.add(tempMap);
+        this.currentCheckPoint += 1;
         // throw new NotImplementedException();
     }
 
@@ -267,8 +301,8 @@ public class GameState {
      */
     public void undo() {
         // TODO
-        if (this.getUndoQuota().isEmpty() || undoQuotaLeft.get() > 0) {
-            if (checkPoints.isEmpty()) {
+        if (this.getUndoQuota().isEmpty() || this.undoQuotaLeft.get() > 0) {
+            if (this.currentCheckPoint == 0) {
                 // change everything to initial - no need to decrement undoquota
                 for (int i = 0; i < this.maxHeight; i++) {
                     for (int j = 0; j < this.maxWidth; j++) {
@@ -287,7 +321,7 @@ public class GameState {
                     }
                 }
                 // this.destinations = new HashSet<>(destinations);
-            } else if (checkPoints.size() == 1) {
+            } else if (this.currentCheckPoint == 1) {
                 // change everything to initial; undoquotaleft-- , empty checkpoints
                 for (int i = 0; i < this.maxHeight; i++) {
                     for (int j = 0; j < this.maxWidth; j++) {
@@ -305,17 +339,18 @@ public class GameState {
                         }
                     }
                 }
+                this.currentCheckPoint = 0;
                 // this.destinations = new HashSet<>(destinations);
                 this.checkPoints.clear();
                 if (this.getUndoQuota().isPresent()) {
-                    undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+                    this.undoQuotaLeft = Optional.of(this.undoQuotaLeft.get() - 1);
                 }
             } else {
                 // Copy entrymap, destinations, checkpoints from checkpoint ; undoquotleft --
-                GameState checkPoint = this.checkPoints.get(checkPoints.size() - 2);
+                var checkPointMap = this.checkPoints.get(checkPoints.size() - 2);
                 for (int i = 0; i < this.maxHeight; i++) {
                     for (int j = 0; j < this.maxWidth; j++) {
-                        var entity = checkPoint.getEntity(Position.of(j, i));
+                        var entity = checkPointMap[i][j];
                         if (entity == null) {
                             entityMap[i][j] = null;
                         } else if (entity instanceof Wall) {
@@ -329,37 +364,13 @@ public class GameState {
                         }
                     }
                 }
-                this.destinations = new HashSet<>(checkPoint.getDestinations());
-                this.checkPoints = null;
-                for (GameState state : checkPoint.checkPoints) {
-                    this.checkPoints.add(new GameState(state));
-                }
+                this.currentCheckPoint -= 1;
+                this.checkPoints.remove(checkPoints.size() - 1);
                 if (this.getUndoQuota().isPresent()) {
-                    undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+                    this.undoQuotaLeft = Optional.of(this.undoQuotaLeft.get() - 1);
                 }
-
             }
         }
-        /*
-        if (checkPoints.isEmpty() || checkPoints.size() == 1) {
-            this.entityMap = this.initialMap;
-            this.undoQuotaLeft = this.initialUndoQuotaLeft;
-            this.destinations = this.initialDestinations;
-        } else if (checkPoints.size() == 1) {
-            this.entityMap = this.initialMap;
-            if (this.undoQuotaLeft.isPresent()) {
-                this.undoQuotaLeft = Optional.of(this.undoQuotaLeft.get() - 1);
-            }
-            this.destinations = this.initialDestinations;
-        } else {
-
-            this.maxHeight = this.checkPoints.get(checkPoints.size() - 2).maxHeight;
-            this.maxWidth = this.checkPoints.get(checkPoints.size() - 2).maxWidth;
-            this.destinations = this.checkPoints.get(checkPoints.size() - 2).destinations;
-        }
-
-         */
-        // throw new NotImplementedException();
     }
 
     /**
