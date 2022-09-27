@@ -45,7 +45,6 @@ class TerminalRenderingEngineTest {
 
         final var renderingEngine = new TerminalRenderingEngine(stream);
         renderingEngine.render(gameState);
-
         final var renderedContent = stream.getContent();
         assertEquals(7, renderedContent.lines().count());
         assertTrue(renderedContent.lines().allMatch(it -> it.length() >= 9 && it.length() <= 10)); // On Windows there may be \n\r

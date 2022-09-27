@@ -15,72 +15,84 @@ public class OwnGameMapTest {
     @Tag(TestKind.PUBLIC)
     @Test
     void testMultiplePlayers() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.multiplePlayersMap));
-        assertTrue(thrown.getMessage().contains("There are multiple same upper-case letters. One player can only exist at one position."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.multiplePlayersMap));
+        assertTrue(thrown.getMessage().contains("duplicate players detected in the map"));
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testUnlimitedUndoQuota() {
+        final var gameMap = TestHelper.parseGameMap(TestMaps.unlimitedUndoQuotaMap);
+        assertEquals(-1, gameMap.getUndoLimit().get());
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testInvalidUndoQuotaOne() {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.invalidUndoQuotaMapOne));
+        assertTrue(thrown.getMessage().contains("invalid undo limit."));
+    }
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testInvalidUndoQuotaTwo() {
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.invalidUndoQuotaMapTwo));
+        assertTrue(thrown.getMessage().contains("Failed to parse undo limit."));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testMultiplePlayersTwo() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.multiplePlayersMapTwo));
-        assertTrue(thrown.getMessage().contains("There are multiple same upper-case letters. One player can only exist at one position."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.multiplePlayersMapTwo));
+        assertTrue(thrown.getMessage().contains("duplicate players detected in the map"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testPlayerWithNoBox() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.playerWithNoBoxMap));
-        assertTrue(thrown.getMessage().contains("Either there is box with no player or player with no box."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.playerWithNoBoxMap));
+        assertTrue(thrown.getMessage().contains("unmatched players"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testBoxWithNoPlayer() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.boxWithNoPlayerMap));
-        assertTrue(thrown.getMessage().contains("Either there is box with no player or player with no box."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.boxWithNoPlayerMap));
+        System.out.println(thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("unmatched players"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testDifferentBoxAndDestination() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.differentBoxAndDestinationMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.differentBoxAndDestinationMap));
+        assertTrue(thrown.getMessage().contains("mismatch destinations"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testDifferentBoxAndDestinationTwo() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.differentBoxAndDestinationMapTwo));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.differentBoxAndDestinationMapTwo));
+        assertTrue(thrown.getMessage().contains("mismatch destinations"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testNoBox() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.noBoxMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noBoxMap));
+        assertTrue(thrown.getMessage().contains("mismatch destinations"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testNoDestination() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.noDestinationMap));
-        assertTrue(thrown.getMessage().contains("The number of boxes is not equal to the number of destinations."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noDestinationMap));
+        assertTrue(thrown.getMessage().contains("mismatch destinations"));
     }
 
     @Tag(TestKind.PUBLIC)
     @Test
     void testNoPlayer() {
-        TestHelper testHelper = new TestHelper();
-        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> testHelper.parseGameMap(TestMaps.noPlayerMap));
-        assertTrue(thrown.getMessage().contains("There is no player in the map."));
+        IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.noPlayerMap));
+        assertTrue(thrown.getMessage().contains("no player"));
     }
 }

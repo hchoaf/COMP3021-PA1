@@ -1,13 +1,20 @@
 package hk.ust.comp3021.tui;
 
+import hk.ust.comp3021.SokobanGameFactory;
 import hk.ust.comp3021.actions.Exit;
 import hk.ust.comp3021.actions.InvalidInput;
+import hk.ust.comp3021.game.GameMap;
 import hk.ust.comp3021.game.GameState;
 import hk.ust.comp3021.game.Position;
+import hk.ust.comp3021.game.SokobanGame;
 import hk.ust.comp3021.utils.TestKind;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashSet;
 
@@ -15,6 +22,27 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 class OwnTerminalSokobanGameTest {
+
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void dummyTest() {
+        var rectangularMap = """
+        0
+        ######
+        #A..@#
+        #...@#
+        #....#
+        #.a..#
+        #..a.#
+        ######
+        """;
+        System.setIn(new ByteArrayInputStream("s\nw\ns\nexit\n".getBytes()));
+        final var game = new TerminalSokobanGame(new GameState(GameMap.parse(rectangularMap)), new TerminalInputEngine(System.in), new TerminalRenderingEngine(System.out));
+
+        game.run();
+
+    }
 
     @Tag(TestKind.PUBLIC)
     @Test

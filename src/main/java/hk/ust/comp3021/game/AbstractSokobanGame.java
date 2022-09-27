@@ -3,8 +3,6 @@ package hk.ust.comp3021.game;
 import hk.ust.comp3021.actions.*;
 import hk.ust.comp3021.entities.Box;
 import hk.ust.comp3021.entities.Empty;
-import hk.ust.comp3021.entities.Wall;
-import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
 import static hk.ust.comp3021.utils.StringResources.*;
@@ -46,7 +44,6 @@ public abstract class AbstractSokobanGame implements SokobanGame {
      */
     protected ActionResult processAction(@NotNull Action action) {
         if (action instanceof Exit) {
-
             return new ActionResult.Success(action);
         } else if (action instanceof Move) {
             var playerId = action.getInitiator();

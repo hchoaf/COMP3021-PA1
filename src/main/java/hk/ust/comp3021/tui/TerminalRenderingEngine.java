@@ -7,7 +7,6 @@ import hk.ust.comp3021.entities.Wall;
 import hk.ust.comp3021.game.GameState;
 import hk.ust.comp3021.game.Position;
 import hk.ust.comp3021.game.RenderingEngine;
-import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.PrintStream;
@@ -34,11 +33,20 @@ public class TerminalRenderingEngine implements RenderingEngine {
                 final var entity = state.getEntity(Position.of(x, y));
                 final var charToPrint = switch (entity) {
                     // TODO
-                    case Wall ignored -> '#';
-                    case Box b-> (char)(b.getPlayerId()+'a');
-                    case Player p -> (char)(p.getId() + 'A');
-                    case Empty ignored -> '.';
-                    case null -> ' ';
+                    case Wall ignored1:
+                        yield '#';
+                    case Box b:
+                        yield (char)(b.getPlayerId() + 'a');
+                    case Player p:
+                        yield (char)(p.getId() + 'A');
+                    case Empty ignored:
+                        if (state.getDestinations().contains(Position.of(x, y))) {
+                            yield '@';
+                        } else {
+                            yield '.';
+                        }
+                    case null:
+                        yield ' ';
                 };
                 builder.append(charToPrint);
             }

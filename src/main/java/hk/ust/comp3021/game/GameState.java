@@ -1,7 +1,6 @@
 package hk.ust.comp3021.game;
 
 import hk.ust.comp3021.entities.*;
-import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
@@ -29,7 +28,7 @@ public class GameState {
     private final Entity[][] initialEntityMap;
 
     private final Set<Position> initialDestinations;
-    Optional<Integer> undoQuotaLeft;
+    private static Optional<Integer> undoQuotaLeft;
 
     private final Optional<Integer> initialUndoQuotaLeft;
 
@@ -204,7 +203,11 @@ public class GameState {
      * {@link Optional#empty()} if the game has unlimited undo.
      */
     public Optional<Integer> getUndoQuota() {
-        return this.undoQuotaLeft;
+        if (undoQuotaLeft.get() >= 0) {
+            return Optional.of(undoQuotaLeft.get());
+        } else {
+            return Optional.empty();
+        }
         // TODO
         // throw new NotImplementedException();
     }
@@ -264,72 +267,78 @@ public class GameState {
      */
     public void undo() {
         // TODO
-        if (checkPoints.isEmpty()) {
-            // change everything to initial
-            for (int i = 0; i<this.maxHeight; i++) {
-                for (int j = 0; j<this.maxWidth; j++) {
-                    var entity = this.initialEntityMap[i][j];
-                    if (entity == null) {
-                        entityMap[i][j] = null;
-                    } else if (entity instanceof Wall) {
-                        entityMap[i][j] = new Wall();
-                    } else if (entity instanceof Empty) {
-                        entityMap[i][j] = new Empty();
-                    } else if (entity instanceof Player) {
-                        entityMap[i][j] = new Player(((Player) entity).getId());
-                    } else if (entity instanceof Box) {
-                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+        if (this.getUndoQuota().isEmpty() || undoQuotaLeft.get() > 0) {
+            if (checkPoints.isEmpty()) {
+                // change everything to initial - no need to decrement undoquota
+                for (int i = 0; i < this.maxHeight; i++) {
+                    for (int j = 0; j < this.maxWidth; j++) {
+                        var entity = this.initialEntityMap[i][j];
+                        if (entity == null) {
+                            entityMap[i][j] = null;
+                        } else if (entity instanceof Wall) {
+                            entityMap[i][j] = new Wall();
+                        } else if (entity instanceof Empty) {
+                            entityMap[i][j] = new Empty();
+                        } else if (entity instanceof Player) {
+                            entityMap[i][j] = new Player(((Player) entity).getId());
+                        } else if (entity instanceof Box) {
+                            entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                        }
                     }
                 }
-            }
-            // this.destinations = new HashSet<>(destinations);
-        } else if (checkPoints.size() == 1) {
-            // change everything to initial except; undoquotaleft-- , empty checkpoints
-            for (int i = 0; i<this.maxHeight; i++) {
-                for (int j = 0; j<this.maxWidth; j++) {
-                    var entity = this.initialEntityMap[i][j];
-                    if (entity == null) {
-                        entityMap[i][j] = null;
-                    } else if (entity instanceof Wall) {
-                        entityMap[i][j] = new Wall();
-                    } else if (entity instanceof Empty) {
-                        entityMap[i][j] = new Empty();
-                    } else if (entity instanceof Player) {
-                        entityMap[i][j] = new Player(((Player) entity).getId());
-                    } else if (entity instanceof Box) {
-                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                // this.destinations = new HashSet<>(destinations);
+            } else if (checkPoints.size() == 1) {
+                // change everything to initial; undoquotaleft-- , empty checkpoints
+                for (int i = 0; i < this.maxHeight; i++) {
+                    for (int j = 0; j < this.maxWidth; j++) {
+                        var entity = this.initialEntityMap[i][j];
+                        if (entity == null) {
+                            entityMap[i][j] = null;
+                        } else if (entity instanceof Wall) {
+                            entityMap[i][j] = new Wall();
+                        } else if (entity instanceof Empty) {
+                            entityMap[i][j] = new Empty();
+                        } else if (entity instanceof Player) {
+                            entityMap[i][j] = new Player(((Player) entity).getId());
+                        } else if (entity instanceof Box) {
+                            entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                        }
                     }
                 }
-            }
-            // this.destinations = new HashSet<>(destinations);
-            this.checkPoints.clear();
-            this.undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
-        } else {
-            // Copy entrymap, destinations, checkpoints from checkpoint ; undoquotleft --
-            GameState checkPoint = this.checkPoints.get(checkPoints.size() - 2);
-            for (int i = 0; i<this.maxHeight; i++) {
-                for (int j = 0; j<this.maxWidth; j++) {
-                    var entity = checkPoint.getEntity(Position.of(j, i));
-                    if (entity == null) {
-                        entityMap[i][j] = null;
-                    } else if (entity instanceof Wall) {
-                        entityMap[i][j] = new Wall();
-                    } else if (entity instanceof Empty) {
-                        entityMap[i][j] = new Empty();
-                    } else if (entity instanceof Player) {
-                        entityMap[i][j] = new Player(((Player) entity).getId());
-                    } else if (entity instanceof Box) {
-                        entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                // this.destinations = new HashSet<>(destinations);
+                this.checkPoints.clear();
+                if (this.getUndoQuota().isPresent()) {
+                    undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+                }
+            } else {
+                // Copy entrymap, destinations, checkpoints from checkpoint ; undoquotleft --
+                GameState checkPoint = this.checkPoints.get(checkPoints.size() - 2);
+                for (int i = 0; i < this.maxHeight; i++) {
+                    for (int j = 0; j < this.maxWidth; j++) {
+                        var entity = checkPoint.getEntity(Position.of(j, i));
+                        if (entity == null) {
+                            entityMap[i][j] = null;
+                        } else if (entity instanceof Wall) {
+                            entityMap[i][j] = new Wall();
+                        } else if (entity instanceof Empty) {
+                            entityMap[i][j] = new Empty();
+                        } else if (entity instanceof Player) {
+                            entityMap[i][j] = new Player(((Player) entity).getId());
+                        } else if (entity instanceof Box) {
+                            entityMap[i][j] = new Box(((Box) entity).getPlayerId());
+                        }
                     }
                 }
-            }
-            this.destinations = new HashSet<>(checkPoint.getDestinations());
-            this.checkPoints = null;
-            for (GameState state : checkPoint.checkPoints) {
-                this.checkPoints.add(new GameState(state));
-            }
-            this.undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+                this.destinations = new HashSet<>(checkPoint.getDestinations());
+                this.checkPoints = null;
+                for (GameState state : checkPoint.checkPoints) {
+                    this.checkPoints.add(new GameState(state));
+                }
+                if (this.getUndoQuota().isPresent()) {
+                    undoQuotaLeft = Optional.of(undoQuotaLeft.get() - 1);
+                }
 
+            }
         }
         /*
         if (checkPoints.isEmpty() || checkPoints.size() == 1) {

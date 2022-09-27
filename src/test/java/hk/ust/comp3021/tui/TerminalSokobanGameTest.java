@@ -31,7 +31,6 @@ class TerminalSokobanGameTest {
         game.run();
 
         final var inOrder = inOrder(inputEngine, renderingEngine);
-
         // Before loop
         inOrder.verify(renderingEngine).render(eq(gameState));
 

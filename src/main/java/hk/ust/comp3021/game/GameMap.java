@@ -1,13 +1,11 @@
 package hk.ust.comp3021.game;
 
 import hk.ust.comp3021.entities.*;
-import hk.ust.comp3021.utils.NotImplementedException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.*;
-import java.util.stream.IntStream;
 
 /**
  * A Sokoban game board.
@@ -87,9 +85,16 @@ public class GameMap {
         // TODO
 
         List<String> arr = new ArrayList<String>(Arrays.asList(mapText.split("\n")));
-
+        var undoLimit = -10;
+        try {
+            undoLimit = Integer.parseInt(arr.get(0));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Failed to parse undo limit.");
+        }
+        if (undoLimit < -1) {
+            throw new IllegalArgumentException("invalid undo limit.");
+        }
         int maxHeight = arr.size() - 1;
-        int undoLimit = Integer.parseInt(arr.get(0));
         int maxWidth = 0;
         Set<Position> destinations = new HashSet<Position>();
         arr.remove(0);
@@ -99,7 +104,6 @@ public class GameMap {
         List<Integer> boxIds = new ArrayList<Integer>();
 
         for(int i = 0; i<arr.size(); i++){
-            System.out.println(arr.get(i));
             maxWidth = Math.max(maxWidth, arr.get(i).length());
         }
 
@@ -130,7 +134,7 @@ public class GameMap {
                                 gameMap.putEntity(Position.of(j, i), new Player(playerId));
                                 playerIds.add(playerId);
                             } else {
-                                throw new IllegalArgumentException("There are multiple same upper-case letters. One player can only exist at one position.");
+                                throw new IllegalArgumentException("duplicate players detected in the map");
                             }
                         } else {
                             if(!boxIds.contains(playerId)) {
@@ -144,13 +148,13 @@ public class GameMap {
         }
 
         if(playerIds.isEmpty()){
-            throw new IllegalArgumentException("There is no player in the map.");
+            throw new IllegalArgumentException("no player");
         }
         if(boxNum != gameMap.destinations.size()){
-            throw new IllegalArgumentException("The number of boxes is not equal to the number of destinations.");
+            throw new IllegalArgumentException("mismatch destinations");
         }
         if(!boxIds.containsAll(playerIds) || !playerIds.containsAll(boxIds)) {
-            throw new IllegalArgumentException("Either there is box with no player or player with no box.");
+            throw new IllegalArgumentException("unmatched players");
         }
 
         return gameMap;

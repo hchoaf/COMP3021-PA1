@@ -2,6 +2,7 @@ package hk.ust.comp3021.game;
 
 import hk.ust.comp3021.actions.Action;
 import hk.ust.comp3021.actions.ActionResult;
+import hk.ust.comp3021.actions.Exit;
 import hk.ust.comp3021.actions.Move;
 import hk.ust.comp3021.utils.TestHelper;
 import hk.ust.comp3021.utils.TestKind;
@@ -33,6 +34,7 @@ class OwnAbstractSokobanGameTest {
         assertTrue(result instanceof ActionResult.Success);
         verify(gameState, times(1)).move(any(), any());
     }
+
 
     private static class SokobanGameForTesting extends AbstractSokobanGame {
 

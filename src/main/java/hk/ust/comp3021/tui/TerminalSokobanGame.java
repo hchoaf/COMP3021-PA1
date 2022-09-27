@@ -2,11 +2,13 @@ package hk.ust.comp3021.tui;
 
 
 import hk.ust.comp3021.actions.ActionResult;
+import hk.ust.comp3021.actions.Exit;
 import hk.ust.comp3021.game.AbstractSokobanGame;
 import hk.ust.comp3021.game.GameState;
 import hk.ust.comp3021.game.InputEngine;
 import hk.ust.comp3021.game.RenderingEngine;
-import hk.ust.comp3021.utils.NotImplementedException;
+
+import static hk.ust.comp3021.utils.StringResources.*;
 
 /**
  * A Sokoban game running in the terminal.
@@ -42,19 +44,38 @@ public class TerminalSokobanGame extends AbstractSokobanGame {
 
     @Override
     public void run() {
+        renderingEngine.message(GAME_READY_MESSAGE);
         // TODO
         // throw new NotImplementedException();
+
         while (!super.shouldStop()) {
-            System.out.println("wowoww");
+            // if (i > 5) throw new NotImplementedException();
             renderingEngine.render(this.state);
+            if (this.state.getUndoQuota().isEmpty()) {
+                renderingEngine.message(UNDO_QUOTA_UNLIMITED);
+            } else {
+                renderingEngine.message(String.format(UNDO_QUOTA_TEMPLATE,this.state.getUndoQuota().get()));
+            }
+            renderingEngine.message(">>>");
+
+
+            // this.state.printEntityMap();
+
             var action = inputEngine.fetchAction();
             var actionResult = processAction(action);
             if (actionResult instanceof ActionResult.Failed) {
                 renderingEngine.message(((ActionResult.Failed) actionResult).getReason());
             } else if (actionResult instanceof ActionResult.Success) {
-
+                if (action instanceof Exit) {
+                    break;
+                }
             }
             // renderingEngine.
+        }
+        renderingEngine.render(state);
+        renderingEngine.message(GAME_EXIT_MESSAGE);
+        if (state.isWin()) {
+            renderingEngine.message(WIN_MESSAGE);
         }
     }
 }

@@ -9,10 +9,42 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class OwnGameStateTest {
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testDummy() {
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testUndoQuotaDoesNotChangeForInfinity() {
+        final var gameState = new GameState(TestHelper.parseGameMap("""
+            -1
+            ######
+            #.Aa@#
+            #..a@#
+            ######
+            """
+        ));
+        assertEquals(Optional.empty(), gameState.getUndoQuota());
+
+        gameState.move(Position.of(3, 1), Position.of(4, 1));
+        gameState.move(Position.of(2, 1), Position.of(3, 1));
+        gameState.checkpoint();
+        gameState.undo();
+        assertEquals(Position.of(2, 1), gameState.getPlayerPositionById(0));
+        assertInstanceOf(Box.class, gameState.getEntity(Position.of(3, 1)));
+        assertInstanceOf(Empty.class, gameState.getEntity(Position.of(4, 1)));
+
+        assertEquals(Optional.empty(), gameState.getUndoQuota());
+
+    }
+
 
     @Tag(TestKind.PUBLIC)
     @Test

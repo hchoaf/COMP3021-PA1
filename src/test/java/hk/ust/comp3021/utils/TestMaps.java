@@ -1,6 +1,32 @@
 package hk.ust.comp3021.utils;
 
 public class TestMaps {
+    public static final String unlimitedUndoQuotaMap = """
+        -1
+        #####
+        #...#
+        #..A#
+        #.a@#
+        #####
+            """;
+
+    public static final String invalidUndoQuotaMapOne = """
+        -2
+        #####
+        #...#
+        #..A#
+        #.a@#
+        #####
+            """;
+
+    public static final String invalidUndoQuotaMapTwo = """
+        ab
+        #####
+        #...#
+        #..A#
+        #.a@#
+        #####
+            """;
     public static final String multiplePlayersMap = """
         5
         #####
