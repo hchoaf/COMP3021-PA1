@@ -72,7 +72,7 @@ public abstract class AbstractSokobanGame implements SokobanGame {
                         return new ActionResult.Success(action);
                     } else {
                         // Can't move the box
-                        return new ActionResult.Failed(action, "Failed to push the box");
+                        return new ActionResult.Failed(action, "Failed to push the box.");
                     }
                 }
             } else if (targetEntity instanceof Wall){
