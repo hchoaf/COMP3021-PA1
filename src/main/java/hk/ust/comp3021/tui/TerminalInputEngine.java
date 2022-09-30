@@ -5,6 +5,7 @@ import hk.ust.comp3021.game.InputEngine;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.InputStream;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 import static hk.ust.comp3021.utils.StringResources.INVALID_INPUT_MESSAGE;
@@ -60,10 +61,10 @@ public class TerminalInputEngine implements InputEngine {
                     return new Move.Down(1);
                 }
                 case "k" -> {
-                    return new Move.Right(1);
+                    return new Move.Up(1);
                 }
                 case "l" -> {
-                    return new Move.Up(1);
+                    return new Move.Right(1);
                 }
                 case "u" -> {
                     return new Undo(-1);
@@ -72,10 +73,11 @@ public class TerminalInputEngine implements InputEngine {
                     return new InvalidInput(-1, INVALID_INPUT_MESSAGE);
                 }
             }
-        } else{
-            return new InvalidInput(-1, INVALID_INPUT_MESSAGE);
+        } else {
+            throw new NoSuchElementException("Line not found");
         }
-
+        // terminalScanner.close();
+        // return new InvalidInput(-1, INVALID_INPUT_MESSAGE);
         // TODO
         // throw new NotImplementedException();
     }

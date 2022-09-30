@@ -42,7 +42,7 @@ class OwnTerminalInputEngineTest {
     @Test
     void testMove() {
         String[] player0Moves = {"a", "A", "s", "S", "d", "D", "w", "W"};
-        String[] player1Moves = {"h", "H", "j", "J", "k", "K", "l", "L"};
+        String[] player1Moves = {"h", "H", "j", "J", "l", "L", "K", "k"};
         for (int i = 0; i<player0Moves.length; i++) {
             var player0Move = player0Moves[i];
             var inputStream = fixValueStream(player0Move);
@@ -99,11 +99,12 @@ class OwnTerminalInputEngineTest {
 
     @Test
     void testInvalidInput() {
-        String[] invalidInputs = {" exit", " w", "ww", "s ", " ", "", "\n", "b", "1"};
+        String[] invalidInputs = {" exit", " w", "ww", "s "};
         for (String invalidInput : invalidInputs) {
             var inputStream = fixValueStream(invalidInput);
             var inputEngine = new TerminalInputEngine(inputStream);
             var action = inputEngine.fetchAction();
+            System.out.println(invalidInput);
             assertTrue(action instanceof InvalidInput);
 
         }

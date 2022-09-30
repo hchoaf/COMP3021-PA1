@@ -128,20 +128,24 @@ public class GameMap {
                         gameMap.destinations.add(Position.of(j, i));
                         break;
                     default:
-                        int playerId = returnIdOfAlphabet(block);
-                        if (Character.isUpperCase(block)) {
-                            if (!playerIds.contains(playerId)) {
-                                gameMap.putEntity(Position.of(j, i), new Player(playerId));
-                                playerIds.add(playerId);
+                        if (Character.isLetter(block)) {
+                            int playerId = returnIdOfAlphabet(block);
+                            if (Character.isUpperCase(block)) {
+                                if (!playerIds.contains(playerId)) {
+                                    gameMap.putEntity(Position.of(j, i), new Player(playerId));
+                                    playerIds.add(playerId);
+                                } else {
+                                    throw new IllegalArgumentException("duplicate players detected in the map");
+                                }
                             } else {
-                                throw new IllegalArgumentException("duplicate players detected in the map");
+                                if (!boxIds.contains(playerId)) {
+                                    boxIds.add(playerId);
+                                }
+                                gameMap.putEntity(Position.of(j, i), new Box(playerId));
+                                boxNum++;
                             }
                         } else {
-                            if(!boxIds.contains(playerId)) {
-                                boxIds.add(playerId);
-                            }
-                            gameMap.putEntity(Position.of(j, i), new Box(playerId));
-                            boxNum++;
+                            throw new IllegalArgumentException("not a closed boundary map");
                         }
                 }
             }

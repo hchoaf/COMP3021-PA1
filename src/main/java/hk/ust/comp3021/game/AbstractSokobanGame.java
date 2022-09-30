@@ -62,7 +62,7 @@ public abstract class AbstractSokobanGame implements SokobanGame {
             } else if (targetEntity instanceof Box) {
                 if (playerId != ((Box) targetEntity).getPlayerId()) {
                     // Can't move a box which does not belong to the player
-                    return new ActionResult.Failed(action, "Failed to push the box.");
+                    return new ActionResult.Failed(action, "You cannot move other players' boxes.");
                 } else {
                     if (state.getEntity(((Move) action).nextPosition(targetPosition)) instanceof Empty) {
                         // Move box then player
