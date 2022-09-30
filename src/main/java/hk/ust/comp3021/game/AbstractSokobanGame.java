@@ -78,7 +78,7 @@ public abstract class AbstractSokobanGame implements SokobanGame {
             } else if (targetEntity instanceof Wall){
                 return new ActionResult.Failed(action, "You hit a wall.");
             } else {
-                return new ActionResult.Failed(action, "You hit a another player.");
+                return new ActionResult.Failed(action, "You hit another player.");
             }
 
         } else if (action instanceof Undo) {

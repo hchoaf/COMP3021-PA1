@@ -7,6 +7,7 @@ import hk.ust.comp3021.utils.TestKind;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -18,6 +19,42 @@ class OwnGameStateTest {
     @Tag(TestKind.PUBLIC)
     @Test
     void testDummy() {
+
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
+    void testAllfunctions() {
+        final var testMap = TestHelper.parseGameMap("""
+            233
+            ######
+            #A..@#
+            #B.b@###
+            #.....@##
+            #.Ee....#
+            #..a.####
+            ######    
+            """);
+        final var gameState = new GameState(testMap);
+        assertEquals(7, gameState.getMapMaxHeight());
+        assertEquals(9, gameState.getMapMaxWidth());
+        assertEquals(Position.of(2, 4), gameState.getPlayerPositionById(4));
+        var destinations = new HashSet<>();
+        destinations.add(Position.of(4, 1));
+        destinations.add(Position.of(4, 2));
+        destinations.add(Position.of(6, 3));
+        System.out.println(gameState.getDestinations().toString());
+        System.out.println(destinations.toString());
+        assertTrue(gameState.getDestinations().containsAll(destinations));
+        assertTrue(destinations.containsAll(gameState.getDestinations()));
+        var playerIds = new ArrayList<>();
+        playerIds.add(0);
+        playerIds.add(1);
+        playerIds.add(4);
+        System.out.println(gameState.getAllPlayerIds().toString());
+        System.out.println(playerIds.toString());
+        assertTrue(gameState.getAllPlayerIds().containsAll(playerIds));
+        assertTrue(playerIds.containsAll(gameState.getAllPlayerIds()));
     }
 
     @Tag(TestKind.PUBLIC)

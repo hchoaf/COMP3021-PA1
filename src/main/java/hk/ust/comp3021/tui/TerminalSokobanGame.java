@@ -37,7 +37,7 @@ public class TerminalSokobanGame extends AbstractSokobanGame {
         // Check the number of players
         // throw new NotImplementedException();
         if (gameState.getAllPlayerIds().size() > 2) {
-            throw new IllegalArgumentException("There are more than two players in the map");
+            throw new IllegalArgumentException("TerminalSokobanGame only support at most two players.");
         }
     }
 
@@ -55,7 +55,7 @@ public class TerminalSokobanGame extends AbstractSokobanGame {
             } else {
                 renderingEngine.message(String.format(UNDO_QUOTA_TEMPLATE,this.state.getUndoQuota().get()));
             }
-            renderingEngine.message(">>>");
+            renderingEngine.message(">>> ");
 
 
             // this.state.printEntityMap();

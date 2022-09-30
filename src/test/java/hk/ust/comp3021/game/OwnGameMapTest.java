@@ -28,6 +28,13 @@ public class OwnGameMapTest {
 
     @Tag(TestKind.PUBLIC)
     @Test
+    void testLotsOfPlayers() {
+        final var gameMap = TestHelper.parseGameMap(TestMaps.lotsOfPlayersMap);
+        assertEquals(26, gameMap.getPlayerIds().size());
+    }
+
+    @Tag(TestKind.PUBLIC)
+    @Test
     void testInvalidUndoQuotaOne() {
         IllegalArgumentException thrown = assertThrows(IllegalArgumentException.class, () -> TestHelper.parseGameMap(TestMaps.invalidUndoQuotaMapOne));
         assertTrue(thrown.getMessage().contains("invalid undo limit."));
